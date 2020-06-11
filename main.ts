@@ -3,6 +3,19 @@ namespace SpriteKind {
     export const rayU = SpriteKind.create()
     export const rayD = SpriteKind.create()
 }
+function PID () {
+    Kp = 0
+    currentVelocityX = mySprite.vx
+    desiredVelocityX = 50
+    epV = desiredVelocityX - currentVelocityX
+    mySprite.vx = epV * Kp
+}
+sprites.onOverlap(SpriteKind.rayD, SpriteKind.Enemy, function (sprite, otherSprite) {
+    mySprite.setVelocity(50, -50)
+})
+sprites.onOverlap(SpriteKind.rayU, SpriteKind.Enemy, function (sprite, otherSprite) {
+    mySprite.setVelocity(50, 0)
+})
 function background () {
     scene.setTile(7, img`
 . . . 6 6 6 6 6 6 6 6 6 6 . . . 
@@ -77,12 +90,6 @@ c b d b b b b b b b b b b d b b
 4 5 5 5 4 4 4 4 2 2 2 2 4 2 4 4 
 `, true)
 }
-sprites.onOverlap(SpriteKind.rayD, SpriteKind.Enemy, function (sprite, otherSprite) {
-    mySprite.setVelocity(50, -50)
-})
-sprites.onOverlap(SpriteKind.rayU, SpriteKind.Enemy, function (sprite, otherSprite) {
-    mySprite.setVelocity(50, 0)
-})
 sprites.onOverlap(SpriteKind.rayF, SpriteKind.Enemy, function (sprite, otherSprite) {
     mySprite.setVelocity(50, 50)
 })
@@ -90,9 +97,13 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     game.splash("x=" + Math.trunc(mySprite.x) + "y=" + Math.trunc(mySprite.y))
 })
 let projectile: Sprite = null
-let rayD: Sprite = null
-let rayU: Sprite = null
-let rayF: Sprite = null
+let rayD2: Sprite = null
+let rayU2: Sprite = null
+let rayF2: Sprite = null
+let epV = 0
+let desiredVelocityX = 0
+let currentVelocityX = 0
+let Kp = 0
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
 . . . . . . . . . . . . . . . . 
@@ -159,7 +170,7 @@ scene.cameraFollowSprite(mySprite)
 mySprite.setVelocity(100, 0)
 background()
 game.onUpdateInterval(100, function () {
-    rayF = sprites.createProjectileFromSprite(img`
+    rayF2 = sprites.createProjectileFromSprite(img`
 . . . . . d d . . . . . . . . . 
 . . . . . d d d . . . . . . . . 
 . . . . . d d d d . . . . . . . 
@@ -177,8 +188,8 @@ game.onUpdateInterval(100, function () {
 . . . . . d d d . . . . . . . . 
 . . . . . d d . . . . . . . . . 
 `, mySprite, 300, 0)
-    rayF.setKind(SpriteKind.rayF)
-    rayU = sprites.createProjectileFromSprite(img`
+    rayF2.setKind(SpriteKind.rayF)
+    rayU2 = sprites.createProjectileFromSprite(img`
 . . . . . d d . . . . . . . . . 
 . . . . . d d d . . . . . . . . 
 . . . . . d d d d . . . . . . . 
@@ -196,8 +207,8 @@ game.onUpdateInterval(100, function () {
 . . . . . d d d . . . . . . . . 
 . . . . . d d . . . . . . . . . 
 `, mySprite, 300, -100)
-    rayU.setKind(SpriteKind.rayU)
-    rayD = sprites.createProjectileFromSprite(img`
+    rayU2.setKind(SpriteKind.rayU)
+    rayD2 = sprites.createProjectileFromSprite(img`
 . . . . . d d . . . . . . . . . 
 . . . . . d d d . . . . . . . . 
 . . . . . d d d d . . . . . . . 
@@ -215,7 +226,7 @@ game.onUpdateInterval(100, function () {
 . . . . . d d d . . . . . . . . 
 . . . . . d d . . . . . . . . . 
 `, mySprite, 300, 100)
-    rayD.setKind(SpriteKind.rayD)
+    rayD2.setKind(SpriteKind.rayD)
 })
 game.onUpdateInterval(300, function () {
     projectile = sprites.createProjectileFromSide(img`
