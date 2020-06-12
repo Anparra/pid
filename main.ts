@@ -2,23 +2,43 @@ namespace SpriteKind {
     export const rayF = SpriteKind.create()
     export const rayU = SpriteKind.create()
     export const rayD = SpriteKind.create()
+    export const goal = SpriteKind.create()
+}
+function PIDdistance () {
+    Kpd = 0.2
+    currentPositionX = mySprite.x
+    epPX = desiredPosition.x - currentPositionX
+    currentPositionY = mySprite.y
+    epPY = desiredPosition.y - currentPositionY
+    if (currentPositionX < desiredPosition.x) {
+        mySprite.x = epPX * Kpd
+        if (currentPositionY < desiredPosition.y) {
+            mySprite.y = epPY * Kpd
+        }
+    }
 }
 function PID () {
-    Kp = 0.1
+    KpV = 0.2
     currentVelocityX = mySprite.vx
     desiredVelocityX = 50
     epVX = desiredVelocityX - currentVelocityX
-    mySprite.vx = epVX * Kp
     currentVelocityY = mySprite.vy
     desiredVelocityY = 0
     epVY = desiredVelocityY - currentVelocityY
-    mySprite.vy = epVY * Kp
+    if (currentVelocityY < desiredVelocityY) {
+        mySprite.vy = epVY * KpV
+    }
+    if (currentVelocityX < desiredVelocityX) {
+        mySprite.vx = epVX * KpV
+    }
 }
 sprites.onOverlap(SpriteKind.rayD, SpriteKind.Enemy, function (sprite, otherSprite) {
     mySprite.setVelocity(50, -50)
+    PID()
 })
 sprites.onOverlap(SpriteKind.rayU, SpriteKind.Enemy, function (sprite, otherSprite) {
     mySprite.setVelocity(50, 0)
+    PID()
 })
 function background () {
     scene.setTile(7, img`
@@ -93,9 +113,29 @@ c b d b b b b b b b b b b d b b
 4 5 5 5 5 5 5 4 4 4 2 4 2 4 2 4 
 4 5 5 5 4 4 4 4 2 2 2 2 4 2 4 4 
 `, true)
+    desiredPosition = sprites.create(img`
+. . . . . . . . . . . . . . . . 
+. . . . . . 4 4 4 4 . . . . . . 
+. . . . 4 4 4 5 5 4 4 4 . . . . 
+. . . 3 3 3 3 4 4 4 4 4 4 . . . 
+. . 4 3 3 3 3 2 2 2 1 1 4 4 . . 
+. . 3 3 3 3 3 2 2 2 1 1 5 4 . . 
+. 4 3 3 3 3 2 2 2 2 2 5 5 4 4 . 
+. 4 3 3 3 2 2 2 4 4 4 4 5 4 4 . 
+. 4 4 3 3 2 2 4 4 4 4 4 4 4 4 . 
+. 4 2 3 3 2 2 4 4 4 4 4 4 4 4 . 
+. . 4 2 3 3 2 4 4 4 4 4 2 4 . . 
+. . 4 2 2 3 2 2 4 4 4 2 4 4 . . 
+. . . 4 2 2 2 2 2 2 2 2 4 . . . 
+. . . . 4 4 2 2 2 2 4 4 . . . . 
+. . . . . . 4 4 4 4 . . . . . . 
+. . . . . . . . . . . . . . . . 
+`, SpriteKind.goal)
+    desiredPosition.setPosition(1594, 279)
 }
 sprites.onOverlap(SpriteKind.rayF, SpriteKind.Enemy, function (sprite, otherSprite) {
     mySprite.setVelocity(50, 50)
+    PID()
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     game.splash("x=" + Math.trunc(mySprite.x) + "y=" + Math.trunc(mySprite.y))
@@ -110,7 +150,13 @@ let currentVelocityY = 0
 let epVX = 0
 let desiredVelocityX = 0
 let currentVelocityX = 0
-let Kp = 0
+let KpV = 0
+let epPY = 0
+let currentPositionY = 0
+let desiredPosition: Sprite = null
+let epPX = 0
+let currentPositionX = 0
+let Kpd = 0
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
 . . . . . . . . . . . . . . . . 
@@ -130,6 +176,7 @@ mySprite = sprites.create(img`
 . . . f f f f f f f f f f . . . 
 . . . . f f . . . f f f . . . . 
 `, SpriteKind.Player)
+controller.moveSprite(mySprite)
 scene.setTileMap(img`
 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 
 7 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 7 
@@ -148,7 +195,7 @@ scene.setTileMap(img`
 7 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 7 
 7 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 7 
 7 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 7 
-7 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 8 
+7 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 . 
 9 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 8 
 9 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 8 
 9 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 5 f 
@@ -176,63 +223,62 @@ mySprite.setPosition(8, 296)
 scene.cameraFollowSprite(mySprite)
 mySprite.setVelocity(100, 0)
 background()
-PID()
 game.onUpdateInterval(100, function () {
     rayF2 = sprites.createProjectileFromSprite(img`
-. . . . . d d . . . . . . . . . 
-. . . . . d d d . . . . . . . . 
-. . . . . d d d d . . . . . . . 
-. . . . . d d d d d . . . . . . 
-. . . . . d d d d d d . . . . . 
-. . . . . d d d d d d d . . . . 
-. . . . . d d d d d d d d . . . 
-. . . . . d d d d d d d d d . . 
-. . . . . d d d d d d d d d . . 
-. . . . . d d d d d d d d . . . 
-. . . . . d d d d d d d . . . . 
-. . . . . d d d d d d . . . . . 
-. . . . . d d d d d . . . . . . 
-. . . . . d d d d . . . . . . . 
-. . . . . d d d . . . . . . . . 
-. . . . . d d . . . . . . . . . 
+. . . . . 5 5 . . . . . . . . . 
+. . . . . 5 5 5 . . . . . . . . 
+. . . . . 5 5 5 5 . . . . . . . 
+. . . . . 5 5 5 5 5 . . . . . . 
+. . . . . 5 5 5 5 5 5 . . . . . 
+. . . . . 5 5 5 5 5 5 5 . . . . 
+. . . . . 5 5 5 5 5 5 5 5 . . . 
+. . . . . 5 5 5 5 5 5 5 5 5 . . 
+. . . . . 5 5 5 5 5 5 5 5 5 . . 
+. . . . . 5 5 5 5 5 5 5 5 . . . 
+. . . . . 5 5 5 5 5 5 5 . . . . 
+. . . . . 5 5 5 5 5 5 . . . . . 
+. . . . . 5 5 5 5 5 . . . . . . 
+. . . . . 5 5 5 5 . . . . . . . 
+. . . . . 5 5 5 . . . . . . . . 
+. . . . . 5 5 . . . . . . . . . 
 `, mySprite, 300, 0)
     rayF2.setKind(SpriteKind.rayF)
     rayU2 = sprites.createProjectileFromSprite(img`
-. . . . . d d . . . . . . . . . 
-. . . . . d d d . . . . . . . . 
-. . . . . d d d d . . . . . . . 
-. . . . . d d d d d . . . . . . 
-. . . . . d d d d d d . . . . . 
-. . . . . d d d d d d d . . . . 
-. . . . . d d d d d d d d . . . 
-. . . . . d d d d d d d d d . . 
-. . . . . d d d d d d d d d . . 
-. . . . . d d d d d d d d . . . 
-. . . . . d d d d d d d . . . . 
-. . . . . d d d d d d . . . . . 
-. . . . . d d d d d . . . . . . 
-. . . . . d d d d . . . . . . . 
-. . . . . d d d . . . . . . . . 
-. . . . . d d . . . . . . . . . 
+. . . . . 5 5 . . . . . . . . . 
+. . . . . 5 5 5 . . . . . . . . 
+. . . . . 5 5 5 5 . . . . . . . 
+. . . . . 5 5 5 5 5 . . . . . . 
+. . . . . 5 5 5 5 5 5 . . . . . 
+. . . . . 5 5 5 5 5 5 5 . . . . 
+. . . . . 5 5 5 5 5 5 5 5 . . . 
+. . . . . 5 5 5 5 5 5 5 5 5 . . 
+. . . . . 5 5 5 5 5 5 5 5 5 . . 
+. . . . . 5 5 5 5 5 5 5 5 . . . 
+. . . . . 5 5 5 5 5 5 5 . . . . 
+. . . . . 5 5 5 5 5 5 . . . . . 
+. . . . . 5 5 5 5 5 . . . . . . 
+. . . . . 5 5 5 5 . . . . . . . 
+. . . . . 5 5 5 . . . . . . . . 
+. . . . . 5 5 . . . . . . . . . 
 `, mySprite, 300, -100)
     rayU2.setKind(SpriteKind.rayU)
     rayD2 = sprites.createProjectileFromSprite(img`
-. . . . . d d . . . . . . . . . 
-. . . . . d d d . . . . . . . . 
-. . . . . d d d d . . . . . . . 
-. . . . . d d d d d . . . . . . 
-. . . . . d d d d d d . . . . . 
-. . . . . d d d d d d d . . . . 
-. . . . . d d d d d d d d . . . 
-. . . . . d d d d d d d d d . . 
-. . . . . d d d d d d d d d . . 
-. . . . . d d d d d d d d . . . 
-. . . . . d d d d d d d . . . . 
-. . . . . d d d d d d . . . . . 
-. . . . . d d d d d . . . . . . 
-. . . . . d d d d . . . . . . . 
-. . . . . d d d . . . . . . . . 
-. . . . . d d . . . . . . . . . 
+. . . . . 5 5 . . . . . . . . . 
+. . . . . 5 5 5 . . . . . . . . 
+. . . . . 5 5 5 5 . . . . . . . 
+. . . . . 5 5 5 5 5 . . . . . . 
+. . . . . 5 5 5 5 5 5 . . . . . 
+. . . . . 5 5 5 5 5 5 5 . . . . 
+. . . . . 5 5 5 5 5 5 5 5 . . . 
+. . . . . 5 5 5 5 5 5 5 5 5 . . 
+. . . . . 5 5 5 5 5 5 5 5 5 . . 
+. . . . . 5 5 5 5 5 5 5 5 . . . 
+. . . . . 5 5 5 5 5 5 5 . . . . 
+. . . . . 5 5 5 5 5 5 . . . . . 
+. . . . . 5 5 5 5 5 . . . . . . 
+. . . . . 5 5 5 5 . . . . . . . 
+. . . . . 5 5 5 . . . . . . . . 
+. . . . . 5 5 . . . . . . . . . 
 `, mySprite, 300, 100)
     rayD2.setKind(SpriteKind.rayD)
 })
