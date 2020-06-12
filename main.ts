@@ -4,11 +4,15 @@ namespace SpriteKind {
     export const rayD = SpriteKind.create()
 }
 function PID () {
-    Kp = 0
+    Kp = 0.1
     currentVelocityX = mySprite.vx
     desiredVelocityX = 50
-    epV = desiredVelocityX - currentVelocityX
-    mySprite.vx = epV * Kp
+    epVX = desiredVelocityX - currentVelocityX
+    mySprite.vx = epVX * Kp
+    currentVelocityY = mySprite.vy
+    desiredVelocityY = 0
+    epVY = desiredVelocityY - currentVelocityY
+    mySprite.vy = epVY * Kp
 }
 sprites.onOverlap(SpriteKind.rayD, SpriteKind.Enemy, function (sprite, otherSprite) {
     mySprite.setVelocity(50, -50)
@@ -100,7 +104,10 @@ let projectile: Sprite = null
 let rayD2: Sprite = null
 let rayU2: Sprite = null
 let rayF2: Sprite = null
-let epV = 0
+let epVY = 0
+let desiredVelocityY = 0
+let currentVelocityY = 0
+let epVX = 0
 let desiredVelocityX = 0
 let currentVelocityX = 0
 let Kp = 0
@@ -169,6 +176,7 @@ mySprite.setPosition(8, 296)
 scene.cameraFollowSprite(mySprite)
 mySprite.setVelocity(100, 0)
 background()
+PID()
 game.onUpdateInterval(100, function () {
     rayF2 = sprites.createProjectileFromSprite(img`
 . . . . . d d . . . . . . . . . 
