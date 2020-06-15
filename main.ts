@@ -4,30 +4,15 @@ namespace SpriteKind {
     export const rayD = SpriteKind.create()
     export const goal = SpriteKind.create()
 }
-function PID () {
-    KpV = 5
-    currentVelocityX = mySprite.vx
-    desiredVelocityX = 50
-    epVX = desiredVelocityX - currentVelocityX
-    currentVelocityY = mySprite.vy
-    desiredVelocityY = 0
-    epVY = desiredVelocityY - currentVelocityY
-    if (currentVelocityY != desiredVelocityY) {
-        mySprite.vy = 0
-    }
-    if (currentVelocityX < desiredVelocityX) {
-        mySprite.vx = epVX * KpV
-    }
-}
 sprites.onOverlap(SpriteKind.rayD, SpriteKind.Enemy, function (sprite, otherSprite) {
     mySprite.setVelocity(40, -70)
     pause(200)
-    PID()
+    PC()
 })
 sprites.onOverlap(SpriteKind.rayU, SpriteKind.Enemy, function (sprite, otherSprite) {
     mySprite.setVelocity(40, 70)
     pause(200)
-    PID()
+    PC()
 })
 function background () {
     scene.setTile(7, img`
@@ -140,21 +125,7 @@ c b d b b b b b b b b b b d b b
 `, SpriteKind.goal)
     desiredPosition.setPosition(1594, 279)
 }
-sprites.onOverlap(SpriteKind.rayF, SpriteKind.Enemy, function (sprite, otherSprite) {
-    mySprite.setVelocity(40, -70)
-    pause(200)
-    PID()
-})
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    game.splash("x=" + Math.trunc(mySprite.x) + "y=" + Math.trunc(mySprite.y))
-})
-scene.onHitTile(SpriteKind.Player, 2, function (sprite) {
-    game.over(true)
-})
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    game.over(false)
-})
-function PIDdistance () {
+function PCdistance () {
     Kpd = 0.2
     currentPositionX = mySprite.x
     epPX = desiredPosition.x - currentPositionX
@@ -167,16 +138,39 @@ function PIDdistance () {
         }
     }
 }
+sprites.onOverlap(SpriteKind.rayF, SpriteKind.Enemy, function (sprite, otherSprite) {
+    mySprite.setVelocity(40, -70)
+    pause(200)
+    PC()
+})
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    game.splash("x=" + Math.trunc(mySprite.x) + "y=" + Math.trunc(mySprite.y))
+})
+scene.onHitTile(SpriteKind.Player, 2, function (sprite) {
+    game.over(true)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    game.over(false)
+})
+function PC () {
+    KpV = 5
+    currentVelocityX = mySprite.vx
+    desiredVelocityX = 50
+    epVX = desiredVelocityX - currentVelocityX
+    currentVelocityY = mySprite.vy
+    desiredVelocityY = 0
+    epVY = desiredVelocityY - currentVelocityY
+    if (currentVelocityY != desiredVelocityY) {
+        mySprite.vy = 0
+    }
+    if (currentVelocityX < desiredVelocityX) {
+        mySprite.vx = epVX * KpV
+    }
+}
 let projectile: Sprite = null
 let rayD2: Sprite = null
 let rayU2: Sprite = null
 let rayF2: Sprite = null
-let epPY = 0
-let currentPositionY = 0
-let epPX = 0
-let currentPositionX = 0
-let Kpd = 0
-let desiredPosition: Sprite = null
 let epVY = 0
 let desiredVelocityY = 0
 let currentVelocityY = 0
@@ -184,6 +178,12 @@ let epVX = 0
 let desiredVelocityX = 0
 let currentVelocityX = 0
 let KpV = 0
+let epPY = 0
+let currentPositionY = 0
+let epPX = 0
+let currentPositionX = 0
+let Kpd = 0
+let desiredPosition: Sprite = null
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
 . . . . . . . . . . . . . . . . 
